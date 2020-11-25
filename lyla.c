@@ -114,42 +114,66 @@ void regset(char reg[], uint32_t value, mach_port_t port){
     
     // get register state from first thread
     thread_get_state(thread_list[0],ARM_THREAD_STATE,(thread_state_t)&arm_state,&sc);
-    
-    if (strcmp(reg,"R0")==0){
-        arm_state.__r[0] = value;
-    }else if (strcmp(reg,"R1")==0){
-        arm_state.__r[1] = value;
-    }else if (strcmp(reg,"R2")==0){
-        arm_state.__r[2] = value;
-    }else if (strcmp(reg,"R3")==0){
-        arm_state.__r[3] = value;
-    }else if (strcmp(reg,"R4")==0){
-        arm_state.__r[4] = value;
-    }else if (strcmp(reg,"R5")==0){
-        arm_state.__r[5] = value;
-    }else if (strcmp(reg,"R6")==0){
-        arm_state.__r[6] = value;
-    }else if (strcmp(reg,"R7")==0){
-        arm_state.__r[7] = value;
-    }else if (strcmp(reg,"R8")==0){
-        arm_state.__r[8] = value;
-    }else if (strcmp(reg,"R9")==0){
-        arm_state.__r[9] = value;
-    }else if (strcmp(reg,"R10")==0){
-        arm_state.__r[10] = value;
-    }else if (strcmp(reg,"R11")==0){
-        arm_state.__r[11] = value;
-    }else if (strcmp(reg,"R12")==0){
-        arm_state.__r[12] = value;
-    }else if (strcmp(reg,"SP")==0){
-        arm_state.__sp = value;
-    }else if (strcmp(reg,"LR")==0){
-        arm_state.__lr = value;
-    }else if (strcmp(reg,"PC")==0){
-        arm_state.__pc = value;
-    }else{
-        printf("[!] Invalid register name specified.\n");
+
+    for(int i=0;i<16;i++){
+        char destreg[20];
+        if(i<13){
+            sprintf(destreg,"R%d",i);
+            if (strcmp(reg,destreg)==0){
+                arm_state.__r[i] = value;
+            }
+        } else if(i==13){
+            if (strcmp(reg,"SP")==0){
+                arm_state.__sp = value;
+            }
+        } else if(i==14){
+            if (strcmp(reg,"LR")==0){
+                arm_state.__lr = value;
+            }
+        } else if(i==15){
+            if (strcmp(reg,"PC")==0){
+                arm_state.__pc = value;
+            }
+        } else{
+            printf("[!] Invalid register name specified.\n");
+        }
     }
+    
+//    if (strcmp(reg,"R0")==0){
+//        arm_state.__r[0] = value;
+//    }else if (strcmp(reg,"R1")==0){
+//        arm_state.__r[1] = value;
+//    }else if (strcmp(reg,"R2")==0){
+//        arm_state.__r[2] = value;
+//    }else if (strcmp(reg,"R3")==0){
+//        arm_state.__r[3] = value;
+//    }else if (strcmp(reg,"R4")==0){
+//        arm_state.__r[4] = value;
+//    }else if (strcmp(reg,"R5")==0){
+//        arm_state.__r[5] = value;
+//    }else if (strcmp(reg,"R6")==0){
+//        arm_state.__r[6] = value;
+//    }else if (strcmp(reg,"R7")==0){
+//        arm_state.__r[7] = value;
+//    }else if (strcmp(reg,"R8")==0){
+//        arm_state.__r[8] = value;
+//    }else if (strcmp(reg,"R9")==0){
+//        arm_state.__r[9] = value;
+//    }else if (strcmp(reg,"R10")==0){
+//        arm_state.__r[10] = value;
+//    }else if (strcmp(reg,"R11")==0){
+//        arm_state.__r[11] = value;
+//    }else if (strcmp(reg,"R12")==0){
+//        arm_state.__r[12] = value;
+//    }else if (strcmp(reg,"SP")==0){
+//        arm_state.__sp = value;
+//    }else if (strcmp(reg,"LR")==0){
+//        arm_state.__lr = value;
+//    }else if (strcmp(reg,"PC")==0){
+//        arm_state.__pc = value;
+//    }else{
+//        printf("[!] Invalid register name specified.\n");
+//    }
     
     thread_set_state(thread_list[0],ARM_THREAD_STATE,(thread_state_t)&arm_state,sc);
     
