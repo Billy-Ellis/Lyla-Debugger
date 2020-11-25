@@ -136,6 +136,7 @@ void regset(char reg[], uint32_t value, mach_port_t port){
             }
         } else{
             printf("[!] Invalid register name specified.\n");
+            return 1; //?
         }
     }
     
