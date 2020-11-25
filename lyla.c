@@ -52,7 +52,7 @@ void registers(mach_port_t port){
     task_threads(port, &thread_list, &thread_count);
 
     if (v){
-        printf("[\033[1m\x1b[35mv\x1b[0m] Number of threads in process: %x\n",thread_count);
+        printf("[*] [\033[1m\x1b[35mv\x1b[0m] Number of threads in process: %x\n",thread_count);
     }
     
     arm_thread_state_t arm_state;
@@ -73,7 +73,7 @@ void read_from(uint32_t addr, size_t size, mach_port_t port){
         printf("[!] Read failed. %s\n",mach_error_string(kr));
     }else{
         if (v){
-            printf("[\033[1m\x1b[35mv\x1b[0m] Call to vm_read_overwrite() succeeded.\n");
+            printf("[+] [\033[1m\x1b[35mv\x1b[0m] Call to vm_read_overwrite() succeeded.\n");
         }
         int a = 0;
         for (int i = 0; i < size; i+=8){
@@ -91,9 +91,9 @@ void write_what_where(uint32_t addr, uint32_t data, mach_port_t port){
         printf("[!] Write failed. %s\n",mach_error_string(kr));
     }else{
         if (v){
-            printf("[\033[1m\x1b[35mv\x1b[0m] Call to vm_write() succeeded.\n");
+            printf("[+] [\033[1m\x1b[35mv\x1b[0m] Call to vm_write() succeeded.\n");
         }
-        printf("Wrote bytes.\n");
+        printf([+] "Wrote bytes.\n");
     }
 }
 
@@ -136,49 +136,12 @@ void regset(char reg[], uint32_t value, mach_port_t port){
             }
         } else{
             printf("[!] Invalid register name specified.\n");
-            return 1; //?
         }
     }
-    
-//    if (strcmp(reg,"R0")==0){
-//        arm_state.__r[0] = value;
-//    }else if (strcmp(reg,"R1")==0){
-//        arm_state.__r[1] = value;
-//    }else if (strcmp(reg,"R2")==0){
-//        arm_state.__r[2] = value;
-//    }else if (strcmp(reg,"R3")==0){
-//        arm_state.__r[3] = value;
-//    }else if (strcmp(reg,"R4")==0){
-//        arm_state.__r[4] = value;
-//    }else if (strcmp(reg,"R5")==0){
-//        arm_state.__r[5] = value;
-//    }else if (strcmp(reg,"R6")==0){
-//        arm_state.__r[6] = value;
-//    }else if (strcmp(reg,"R7")==0){
-//        arm_state.__r[7] = value;
-//    }else if (strcmp(reg,"R8")==0){
-//        arm_state.__r[8] = value;
-//    }else if (strcmp(reg,"R9")==0){
-//        arm_state.__r[9] = value;
-//    }else if (strcmp(reg,"R10")==0){
-//        arm_state.__r[10] = value;
-//    }else if (strcmp(reg,"R11")==0){
-//        arm_state.__r[11] = value;
-//    }else if (strcmp(reg,"R12")==0){
-//        arm_state.__r[12] = value;
-//    }else if (strcmp(reg,"SP")==0){
-//        arm_state.__sp = value;
-//    }else if (strcmp(reg,"LR")==0){
-//        arm_state.__lr = value;
-//    }else if (strcmp(reg,"PC")==0){
-//        arm_state.__pc = value;
-//    }else{
-//        printf("[!] Invalid register name specified.\n");
-//    }
-    
+ 
     thread_set_state(thread_list[0],ARM_THREAD_STATE,(thread_state_t)&arm_state,sc);
     
-    printf("Registers updated.\n");
+    printf("[+] Registers updated.\n");
 }
 
 void cli(mach_port_t port){
@@ -233,10 +196,10 @@ void cli(mach_port_t port){
             write_what_where(addr,data,port);
         }else if (strcmp(cmd[0],"suspend")==0){
             task_suspend(port);
-            printf("Task suspended.\n");
+            printf("[+] Task suspended.\n");
         }else if (strcmp(cmd[0],"resume")==0){
             task_resume(port);
-            printf("Task resumed.\n");
+            printf("[+] Task resumed.\n");
         }else{
             printf("[!] Invalid command.\n");
         }
@@ -246,7 +209,7 @@ void cli(mach_port_t port){
 void check_root(){
     // make sure Lyla is running as root
     if (getuid() && geteuid()){
-        printf("Lyla isn't running as root.\nCannot continue.\n");
+        printf("[!] Lyla isn't running as root.\nCannot continue.\n");
         exit(0);
     }
 }
@@ -258,7 +221,7 @@ int main(int argc, char *argv[]){
         if (strcmp(argv[1],"-v")==0){
             // verbose mode enabled
             v = 1;
-            printf("[\033[1m\x1b[35mv\x1b[0m] Verbose mode enabled.\n");
+            printf("[+] [\033[1m\x1b[35mv\x1b[0m] Verbose mode enabled.\n");
         }
     }
 
@@ -271,11 +234,11 @@ int main(int argc, char *argv[]){
     printf("\x1b[0m");
     
     if (pid == 0){
-        printf("Lyla does not currently support kernel debugging.\n");
+        printf("[!] Lyla does not currently support kernel debugging.\n");
         exit(0);
     }
 
-    printf("Attaching to PID %d...\n\n",pid);
+    printf("[+] Attaching to PID %d...\n\n",pid);
 
     mach_port_t port;
     kern_return_t kr;
@@ -283,16 +246,16 @@ int main(int argc, char *argv[]){
     if ((kr = task_for_pid(mach_task_self(), pid, &port)) != KERN_SUCCESS){
         printf("[!] Error!\n");
         if (v){
-            printf("[\033[1m\x1b[35mv\x1b[0m] Call to task_for_pid() with PID %d failed.\n",pid);
+            printf("[!] [\033[1m\x1b[35mv\x1b[0m] Call to task_for_pid() with PID %d failed.\n",pid);
         }
         exit(0);
     }
 
     if (v){
-        printf("\033[1m[\x1b[35mv\x1b[0m] Got task port 0x%x for PID %d\n",port,pid);
+        printf("[+] \033[1m[\x1b[35mv\x1b[0m] Got task port 0x%x for PID %d\n",port,pid);
     }
 
-    printf("Attached PID %d\n\n",pid);
+    printf("[+] Attached PID %d\n\n",pid);
 
     cli(port);
 
